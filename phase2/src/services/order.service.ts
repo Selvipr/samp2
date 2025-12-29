@@ -5,7 +5,6 @@ export class OrderService {
     static async getUserOrders(userId: string): Promise<Order[]> {
         const supabase = await createClient()
 
-        // Fetch orders
         const { data: orders, error } = await supabase
             .from('orders')
             .select('*')
@@ -20,8 +19,116 @@ export class OrderService {
         return orders as Order[]
     }
 
-    // Placeholder for creating an order
-    static async createOrder(orderData: any) {
-        // Implementation needed for Checkout phase
+    static async getOrderById(orderId: string): Promise<any> {
+        const supabase = await createClient()
+        const { data, error } = await supabase
+            .from('orders')
+            .select(`
+                *,
+                buyer:users!buyer_id(email),
+                disputes(*)
+            `)
+            .eq('id', orderId)
+            .single()
+
+        if (error) return null
+        return data
+    }
+
+    // Purchase Flow: 
+    // 1. Find available inventory for product
+    // 2. Lock inventory
+    // 3. Create Order
+    static async createOrder(buyerId: string, productId: string, price: number) {
+        const supabase = await createClient()
+
+        // 1. Find inventory
+        const { data: inventory, error: invError } = await supabase
+            .from('inventory')
+            .select('id, product:products(id, title, price, seller_id)')
+            .eq('product_id', productId)
+            .eq('status', 'available')
+            .limit(1)
+            .single()
+
+        if (invError || !inventory) throw new Error('Out of Stock')
+
+        // 2. Lock inventory 
+        const { error: lockError } = await supabase
+            .from('inventory')
+            .update({ status: 'locked' })
+            .eq('id', inventory.id)
+
+        if (lockError) throw new Error('Failed to lock inventory')
+
+        // 3. Create Order
+        const releaseDate = new Date()
+        releaseDate.setHours(releaseDate.getHours() + 24) // 24h auto-release
+
+        const product = (inventory as any).product
+
+        const { data: order, error: orderError } = await supabase
+            .from('orders')
+            .insert({
+                buyer_id: buyerId,
+                total: price,
+                status: 'escrow',
+                escrow_release_at: releaseDate.toISOString(),
+                // @ts-ignore - items column added via migration
+                items: [{
+                    id: product.id,
+                    title: product.title,
+                    price: product.price,
+                    seller_id: product.seller_id
+                }]
+            })
+            .select()
+            .single()
+
+        if (orderError) throw orderError
+
+        // 4. Update inventory with order_id (if migration applied)
+        // Best effort:
+        await supabase
+            .from('inventory')
+            .update({ order_id: order.id } as any)
+            .eq('id', inventory.id)
+
+        return order
+    }
+
+    static async confirmOrder(orderId: string, sellerId: string, amount: number) {
+        const supabase = await createClient()
+
+        // 1. Update Order status
+        const { error: orderError } = await supabase
+            .from('orders')
+            .update({ status: 'completed' }) // Changed to 'completed' to match page check
+            .eq('id', orderId)
+
+        if (orderError) throw orderError
+
+        // 2. Increment Seller Balance 
+        const { data: seller, error: sellerError } = await supabase
+            .from('users')
+            .select('wallet_balance')
+            .eq('id', sellerId)
+            .single()
+
+        if (!sellerError && seller) {
+            await supabase
+                .from('users')
+                .update({ wallet_balance: (seller.wallet_balance || 0) + amount })
+                .eq('id', sellerId)
+        }
+    }
+
+    static async disputeOrder(orderId: string) {
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('orders')
+            .update({ status: 'disputed' })
+            .eq('id', orderId)
+        if (error) throw error
     }
 }

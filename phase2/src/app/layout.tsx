@@ -3,7 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { createClient } from "@/lib/supabase/server";
+import { CartProvider } from "@/context/CartContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,6 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Shop2games | Hybrid Digital Marketplace",
   description: "Direct Top-Up & P2P Keys",
+  manifest: '/manifest.json',
 };
 
 export default async function RootLayout({
@@ -33,11 +36,14 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0c]`}
       >
-        <Navbar user={user} />
-        <main className="pt-16">
-          {children}
-        </main>
-        <Footer />
+        <CartProvider>
+          <Navbar user={user} />
+          <ServiceWorkerRegister />
+          <main className="pt-16">
+            {children}
+          </main>
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

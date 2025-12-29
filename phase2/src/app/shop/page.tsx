@@ -1,9 +1,17 @@
 import { ProductService } from '@/services/product.service'
 import GameCard from '@/components/GameCard'
 
-export default async function ShopPage() {
+export default async function ShopPage({
+    searchParams,
+}: {
+    searchParams: { q?: string }
+}) {
+    const query = searchParams?.q || ''
+
     // Fetch products via Service
-    const products = await ProductService.getAllProducts()
+    const products = query
+        ? await ProductService.searchProducts(query)
+        : await ProductService.getAllProducts()
 
     return (
         <div className="min-h-screen bg-[#0a0a0c] text-white">
@@ -18,14 +26,35 @@ export default async function ShopPage() {
                         Browse Games <span className="text-indigo-500">.</span>
                     </h1>
 
+                    {/* Search Bar */}
+                    <div className="mb-12 max-w-xl">
+                        <form action="/shop" method="get" className="relative">
+                            <input
+                                type="text"
+                                name="q"
+                                defaultValue={query}
+                                placeholder="Search games, keys, or software..."
+                                className="w-full rounded-full bg-white/10 border border-white/20 py-4 pl-6 pr-12 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white/20 transition-all backdrop-blur-md"
+                            />
+                            <button
+                                type="submit"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-indigo-600/80 hover:bg-indigo-500 text-white transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+
                     {/* Filter Tabs (Static for now) */}
                     <div className="flex gap-4 mb-12 overflow-x-auto pb-4">
                         {['All Games', 'MOBA', 'FPS', 'RPG', 'Vouchers'].map((category, i) => (
                             <button
                                 key={category}
                                 className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${i === 0
-                                        ? 'bg-white text-black'
-                                        : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                                    ? 'bg-white text-black'
+                                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
                                     }`}
                             >
                                 {category}

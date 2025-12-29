@@ -21,6 +21,30 @@ export class ProductService {
     }
 
     /**
+     * Search products using Postgres Full Text Search
+     */
+    static async searchProducts(query: string): Promise<Product[]> {
+        const supabase = await createClient()
+
+        // Using Supabase textSearch (websearch uses plain English query handling)
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .textSearch('title', query, {
+                type: 'websearch',
+                config: 'english'
+            })
+            .order('created_at', { ascending: false })
+
+        if (error) {
+            console.error('Error searching products:', error)
+            return []
+        }
+
+        return data as Product[]
+    }
+
+    /**
      * Fetches a single product by ID.
      */
     static async getProductById(id: string): Promise<Product | null> {

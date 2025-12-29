@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { OrderService } from '@/services/order.service'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 export default async function OrdersPage() {
     const supabase = await createClient()
@@ -33,8 +34,8 @@ export default async function OrdersPage() {
                                     <div className="flex items-center gap-4">
                                         <h3 className="text-lg font-bold text-white">Order #{order.id.substring(0, 8)}</h3>
                                         <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset ${order.status === 'completed' ? 'bg-green-400/10 text-green-400 ring-green-400/20' :
-                                                order.status === 'pending' ? 'bg-yellow-400/10 text-yellow-400 ring-yellow-400/20' :
-                                                    'bg-red-400/10 text-red-400 ring-red-400/20'
+                                            order.status === 'pending' ? 'bg-yellow-400/10 text-yellow-400 ring-yellow-400/20' :
+                                                'bg-red-400/10 text-red-400 ring-red-400/20'
                                             }`}>
                                             {order.status}
                                         </span>
@@ -45,9 +46,9 @@ export default async function OrdersPage() {
                                 </div>
                                 <div className="mt-4 sm:mt-0 text-right">
                                     <p className="text-2xl font-bold text-white">${order.total}</p>
-                                    <button className="mt-2 text-sm text-indigo-400 hover:text-indigo-300">
+                                    <Link href={`/orders/${order.id}`} className="mt-2 text-sm text-indigo-400 hover:text-indigo-300 inline-block">
                                         View Details
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         ))}
