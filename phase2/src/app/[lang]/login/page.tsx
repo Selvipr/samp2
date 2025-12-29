@@ -7,6 +7,7 @@ import { useState } from 'react'
 
 import { login } from './actions'
 import { useTransition } from 'react'
+import { useDictionary } from '@/components/LanguageProvider'
 
 export default function LoginPage() {
     const router = useRouter()
@@ -49,6 +50,8 @@ export default function LoginPage() {
 
     const [showPassword, setShowPassword] = useState(false)
 
+    const { auth } = useDictionary()
+
     return (
         <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-[#0a0a0c] text-white">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -56,7 +59,7 @@ export default function LoginPage() {
                     Shop2<span className="text-indigo-500">games</span>
                 </Link>
                 <h2 className="mt-6 text-center text-xl font-bold leading-9 tracking-tight text-white">
-                    Sign in to your account
+                    {auth.signInTitle}
                 </h2>
             </div>
 
@@ -70,7 +73,7 @@ export default function LoginPage() {
                 <form className="space-y-6" onSubmit={handleLogin}>
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-300">
-                            Email address
+                            {auth.email}
                         </label>
                         <div className="mt-2">
                             <input
@@ -89,11 +92,11 @@ export default function LoginPage() {
                     <div>
                         <div className="flex items-center justify-between">
                             <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-300">
-                                Password
+                                {auth.password}
                             </label>
                             <div className="text-sm">
                                 <Link href="/forgot-password" className="font-semibold text-indigo-400 hover:text-indigo-300">
-                                    Forgot password?
+                                    {auth.forgotPassword}
                                 </Link>
                             </div>
                         </div>
@@ -133,7 +136,7 @@ export default function LoginPage() {
                             disabled={loading}
                             className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
                         >
-                            {loading ? 'Signing in...' : 'Sign in'}
+                            {loading ? auth.signingIn : auth.signIn}
                         </button>
                     </div>
                 </form>
@@ -144,7 +147,7 @@ export default function LoginPage() {
                             <div className="w-full border-t border-gray-700" />
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="bg-[#0a0a0c] px-2 text-gray-500">Or continue with</span>
+                            <span className="bg-[#0a0a0c] px-2 text-gray-500">{auth.orContinue}</span>
                         </div>
                     </div>
 
@@ -174,9 +177,9 @@ export default function LoginPage() {
                 </div>
 
                 <p className="mt-10 text-center text-sm text-gray-400">
-                    Not a member?{' '}
+                    {auth.notMember}{' '}
                     <Link href="/register" className="font-semibold leading-6 text-indigo-400 hover:text-indigo-300">
-                        Sign up now
+                        {auth.signUpNow}
                     </Link>
                 </p>
             </div>

@@ -3,7 +3,8 @@ import { AdminService } from '@/services/admin.service'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AdminDashboard() {
+export default async function AdminDashboard({ params }: { params: { lang: string } }) {
+    const { lang } = await params;
     const supabase = await createClient()
 
     // Fetch Analytics Data
@@ -29,6 +30,23 @@ export default async function AdminDashboard() {
     return (
         <div className="space-y-8">
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+
+            <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-4 text-gray-400">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <a href={`/${lang}/admin/settings`} className="flex items-center gap-4 bg-gray-900 border border-white/10 p-4 rounded-xl hover:bg-white/5 transition-colors group">
+                        <div className="p-3 bg-purple-500/10 rounded-lg group-hover:bg-purple-500/20 text-purple-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-white">System Settings</h3>
+                            <p className="text-xs text-gray-500">Currency & Global Configs</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -126,8 +144,8 @@ export default async function AdminDashboard() {
                                 <div className="w-full bg-gray-800 rounded-full h-2">
                                     <div
                                         className={`h-2 rounded-full ${stat.status === 'completed' ? 'bg-green-500' :
-                                                stat.status === 'pending' || stat.status === 'escrow' ? 'bg-yellow-500' :
-                                                    'bg-red-500'
+                                            stat.status === 'pending' || stat.status === 'escrow' ? 'bg-yellow-500' :
+                                                'bg-red-500'
                                             }`}
                                         style={{ width: `${(stat.count / (ordersCount || 1)) * 100}%` }}
                                     />

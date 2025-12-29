@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { OrderService } from '@/services/order.service'
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ params }: { params: { lang: string } }) {
+    const { lang } = await params;
     const supabase = await createClient()
 
     const {
@@ -103,7 +104,7 @@ export default async function DashboardPage() {
                                 )}
                                 {profile?.role === 'admin' && (
                                     <Link
-                                        href="/admin"
+                                        href={`/${lang}/admin`}
                                         className="flex items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
                                     >
                                         Admin Panel

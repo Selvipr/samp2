@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { ProductService } from '@/services/product.service'
 import GameCard from '@/components/GameCard'
+import { Suspense } from 'react'
+import { GameCardSkeletonGrid } from '@/components/Skeletons'
 
-export default async function Home() {
-    const products = await ProductService.getAllProducts()
-
+export default function Home() {
     return (
         <div className="flex min-h-screen flex-col bg-[#0a0a0c] text-white">
             {/* Hero Section */}
@@ -45,11 +45,9 @@ export default async function Home() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-                    {products.slice(0, 4).map((product) => (
-                        <GameCard key={product.id} product={product} />
-                    ))}
-                </div>
+                <Suspense fallback={<GameCardSkeletonGrid count={4} />}>
+                    <FeaturedGames />
+                </Suspense>
 
                 {/* Value Props */}
                 <div className="mt-24 grid grid-cols-1 gap-8 sm:grid-cols-3">
@@ -82,6 +80,18 @@ export default async function Home() {
                     </div>
                 </div>
             </section>
+        </div>
+    )
+}
+
+async function FeaturedGames() {
+    const products = await ProductService.getAllProducts()
+
+    return (
+        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+            {products.slice(0, 4).map((product) => (
+                <GameCard key={product.id} product={product} />
+            ))}
         </div>
     )
 }

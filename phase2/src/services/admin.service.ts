@@ -122,4 +122,27 @@ export class AdminService {
         // Return simple count for now, maybe growth later if needed
         return count
     }
+
+    // System Settings
+    static async getSystemSettings(key: string) {
+        const supabase = await createClient()
+        const { data, error } = await supabase
+            .from('system_settings')
+            .select('value')
+            .eq('key', key)
+            .single()
+
+        if (error) return null // return null if not found
+        return data?.value || null
+    }
+
+    static async updateSystemSetting(key: string, value: string) {
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('system_settings')
+            .upsert({ key, value })
+
+        if (error) throw error
+        return true
+    }
 }

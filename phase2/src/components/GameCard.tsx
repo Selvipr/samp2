@@ -2,10 +2,12 @@
 
 import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
+import { useCurrency } from '@/context/CurrencyContext'
 import { Product } from '@/models/types'
 
 export default function GameCard({ product }: { product: Product }) {
     const { addToCart } = useCart()
+    const { formatPrice } = useCurrency()
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault()
@@ -37,7 +39,7 @@ export default function GameCard({ product }: { product: Product }) {
                         {product.type === 'direct_api' ? 'Instant Top-Up' : 'digital Key'}
                     </p>
                     <div className="mt-2 text-green-400 font-bold">
-                        ${product.price}
+                        {formatPrice(product.price)}
                     </div>
                 </div>
             </div>

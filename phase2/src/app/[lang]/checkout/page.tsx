@@ -2,12 +2,14 @@
 
 import { useCart } from '@/context/CartContext'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { useState } from 'react'
 
 export default function CheckoutPage() {
     const { items, cartTotal, clearCart } = useCart()
     const router = useRouter()
+    const params = useParams()
+    const lang = params?.lang ?? 'en'
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
@@ -32,7 +34,7 @@ export default function CheckoutPage() {
             const { data: { user } } = await supabase.auth.getUser()
 
             if (!user) {
-                router.push('/login?next=/checkout')
+                router.push(`/${lang}/login?next=/${lang}/checkout`)
                 return
             }
 
@@ -50,7 +52,8 @@ export default function CheckoutPage() {
             }
 
             clearCart()
-            router.push(`/orders/${result.orderId}`)
+            clearCart()
+            router.push(`/${lang}/orders/${result.orderId}`)
 
         } catch (err) {
             console.error(err)

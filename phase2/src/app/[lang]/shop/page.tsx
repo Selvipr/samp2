@@ -1,17 +1,14 @@
 import { ProductService } from '@/services/product.service'
 import GameCard from '@/components/GameCard'
+import { Suspense } from 'react'
+import { GameCardSkeletonGrid } from '@/components/Skeletons'
 
-export default async function ShopPage({
+export default function ShopPage({
     searchParams,
 }: {
     searchParams: { q?: string }
 }) {
     const query = searchParams?.q || ''
-
-    // Fetch products via Service
-    const products = query
-        ? await ProductService.searchProducts(query)
-        : await ProductService.getAllProducts()
 
     return (
         <div className="min-h-screen bg-[#0a0a0c] text-white">
@@ -63,19 +60,32 @@ export default async function ShopPage({
                     </div>
 
                     {/* Grid */}
-                    <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-24">
-                        {products?.map((product) => (
-                            <GameCard key={product.id} product={product} />
-                        ))}
-
-                        {(!products || products.length === 0) && (
-                            <div className="col-span-full text-center py-20 text-gray-500">
-                                No games found. Database seeding might be needed.
-                            </div>
-                        )}
-                    </div>
+                    <Suspense fallback={<GameCardSkeletonGrid count={8} />}>
+                        <ShopGrid query={query} />
+                    </Suspense>
                 </div>
             </div>
+        </div>
+    )
+}
+
+async function ShopGrid({ query }: { query: string }) {
+    // Fetch products via Service
+    const products = query
+        ? await ProductService.searchProducts(query)
+        : await ProductService.getAllProducts()
+
+    return (
+        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-24">
+            {products?.map((product) => (
+                <GameCard key={product.id} product={product} />
+            ))}
+
+            {(!products || products.length === 0) && (
+                <div className="col-span-full text-center py-20 text-gray-500">
+                    No games found. Database seeding might be needed.
+                </div>
+            )}
         </div>
     )
 }

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useDictionary } from '@/components/LanguageProvider'
 
 export default function RegisterPage() {
     const router = useRouter()
