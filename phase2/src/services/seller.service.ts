@@ -73,4 +73,39 @@ export class SellerService {
         if (error) throw error
         return count || 0
     }
+
+    // Get detailed inventory list for a product
+    static async getProductInventory(productId: string) {
+        const supabase = createClient()
+        const { data, error } = await supabase
+            .from('inventory')
+            .select('*')
+            .eq('product_id', productId)
+            .order('created_at', { ascending: false })
+
+        if (error) throw error
+        return data
+    }
+
+    // Delete inventory item (only if available)
+    static async deleteInventoryItem(inventoryId: string) {
+        const supabase = createClient()
+
+        // 1. Check status first (optional safety, or just rely on RLS/Query)
+        const { data: item } = await supabase
+            .from('inventory')
+            .select('status')
+            .eq('id', inventoryId)
+            .single()
+
+        if (!item) throw new Error("Item not found")
+        if (item.status !== 'available') throw new Error("Cannot delete sold or locked items")
+
+        const { error } = await supabase
+            .from('inventory')
+            .delete()
+            .eq('id', inventoryId)
+
+        if (error) throw error
+    }
 }
