@@ -4,12 +4,13 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { Product } from '@/models/types'
 
 type CartItem = Product & {
-    cartId: string // Unique ID for this instance in cart (in case of duplicates if allowed, or just consistency)
+    cartId: string
+    formData?: Record<string, any>
 }
 
 type CartContextType = {
     items: CartItem[]
-    addToCart: (product: Product) => void
+    addToCart: (product: Product, formData?: Record<string, any>) => void
     removeFromCart: (cartId: string) => void
     clearCart: () => void
     cartTotal: number
@@ -42,10 +43,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     }, [items, isLoaded])
 
-    const addToCart = (product: Product) => {
-        // Generate a random ID for the cart item to allow removing specific instances if we ever allow multiples
-        // For digital keys, multiples might be valid (2 keys for same game)
-        const newItem = { ...product, cartId: crypto.randomUUID() }
+    const addToCart = (product: Product, formData?: Record<string, any>) => {
+        // Generate a random ID for the cart item
+        const newItem = { ...product, cartId: crypto.randomUUID(), formData }
         setItems(prev => [...prev, newItem])
     }
 

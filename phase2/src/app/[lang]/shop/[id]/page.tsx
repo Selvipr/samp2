@@ -3,27 +3,29 @@ import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { ProductDetailSkeleton } from '@/components/Skeletons'
 import { Product } from '@/models/types'
+import ProductPurchaseForm from '@/components/ProductPurchaseForm'
 
 interface ProductPageProps {
     params: Promise<{
         id: string
+        lang: string
     }>
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
     // Await params in Next.js 15
-    const { id } = await params
+    const { id, lang } = await params
 
     return (
         <div className="min-h-screen bg-[#0a0a0c] text-white">
             <Suspense fallback={<ProductDetailSkeleton />}>
-                <ProductView id={id} />
+                <ProductView id={id} lang={lang} />
             </Suspense>
         </div>
     )
 }
 
-async function ProductView({ id }: { id: string }) {
+async function ProductView({ id, lang }: { id: string, lang: string }) {
     const product = await ProductService.getProductById(id)
 
     if (!product) {
@@ -61,56 +63,14 @@ async function ProductView({ id }: { id: string }) {
 
                 {/* Form Column */}
                 <div className="mt-10 lg:mt-0">
-                    <div className="rounded-2xl bg-white/5 p-8 border border-white/10 shadow-2xl backdrop-blur-sm">
-                        <h2 className="text-xl font-semibold mb-6">Top-Up Details</h2>
-
-                        <form className="space-y-6">
-                            {/* Dynamic Form Generation */}
-                            {schema?.fields?.map((field: any) => (
-                                <div key={field.name}>
-                                    <label htmlFor={field.name} className="block text-sm font-medium leading-6 text-white">
-                                        {field.label} {field.required && <span className="text-red-500">*</span>}
-                                    </label>
-                                    <div className="mt-2">
-                                        {field.type === 'select' ? (
-                                            <select
-                                                id={field.name}
-                                                name={field.name}
-                                                className="block w-full rounded-md border-0 bg-white/5 py-2.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 [&_*]:bg-gray-900"
-                                            >
-                                                {field.options?.map((opt: string) => (
-                                                    <option key={opt} value={opt}>{opt}</option>
-                                                ))}
-                                            </select>
-                                        ) : (
-                                            <input
-                                                type={field.type === 'number' ? 'number' : 'text'}
-                                                name={field.name}
-                                                id={field.name}
-                                                required={field.required}
-                                                className="block w-full rounded-md border-0 bg-white/5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 placeholder:text-gray-500"
-                                                placeholder={`Enter ${field.label}`}
-                                            />
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-
-                            <div className="pt-6 border-t border-white/10 my-6">
-                                <div className="flex justify-between items-center mb-4">
-                                    <span className="text-gray-400">Total Price</span>
-                                    <span className="text-2xl font-bold text-white">${product.price > 0 ? product.price : ' --'}</span>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    className="w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
-                                >
-                                    Proceed to Payment
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    <ProductPurchaseForm product={product} lang={lang} />
+                    {/* Note: In a real app, 'lang' should be passed down from params properly. 
+                        For now hardcoding 'en' or need to drill it from ProductPage props. 
+                        Let's update ProductView signature to accept lang if needed, 
+                        but to minimize diff, assuming 'en' or simple fix. 
+                        Wait, this file has 'params' with lang. 
+                        I should update ProductView to accept lang.
+                    */}
                 </div>
             </div>
         </div>

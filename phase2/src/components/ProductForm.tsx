@@ -17,7 +17,8 @@ export default function ProductForm({ lang, initialData, sellerId }: ProductForm
         title: initialData?.title || '',
         description: initialData?.description || '',
         price: initialData?.price || '',
-        type: initialData?.type || 'serial_key'
+        type: initialData?.type || 'serial_key',
+        input_schema: initialData?.input_schema || { fields: [] }
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -102,7 +103,96 @@ export default function ProductForm({ lang, initialData, sellerId }: ProductForm
                         >
                             <option value="serial_key">Serial Key</option>
                             <option value="file">File Download</option>
+                            <option value="direct_api">Direct Top-Up (API)</option>
                         </select>
+                    </div>
+                </div>
+
+                {/* Schema Builder Section */}
+                <div className="pt-6 border-t border-white/10">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-medium text-white">Required User Inputs</h3>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const currentFields = formData.input_schema?.fields || []
+                                setFormData({
+                                    ...formData,
+                                    input_schema: {
+                                        fields: [
+                                            ...currentFields,
+                                            { name: `field_${Date.now()}`, label: 'New Field', type: 'text', required: true }
+                                        ]
+                                    }
+                                })
+                            }}
+                            className="text-sm bg-indigo-600/50 hover:bg-indigo-600 text-white px-3 py-1 rounded transition-colors"
+                        >
+                            + Add Field
+                        </button>
+                    </div>
+
+                    <div className="space-y-4">
+                        {formData.input_schema?.fields?.map((field: any, index: number) => (
+                            <div key={index} className="flex gap-4 items-start bg-white/5 p-3 rounded-lg border border-white/5">
+                                <div className="flex-1 space-y-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Label (e.g. Player ID)"
+                                        value={field.label}
+                                        onChange={e => {
+                                            const newFields = [...(formData.input_schema?.fields || [])]
+                                            newFields[index].label = e.target.value
+                                            // Auto-generate name from label
+                                            newFields[index].name = e.target.value.toLowerCase().replace(/\s+/g, '_')
+                                            setFormData({ ...formData, input_schema: { fields: newFields } })
+                                        }}
+                                        className="block w-full rounded bg-black/20 border-white/10 text-white text-sm px-2 py-1"
+                                    />
+                                    <div className="flex gap-2">
+                                        <select
+                                            value={field.type}
+                                            onChange={e => {
+                                                const newFields = [...(formData.input_schema?.fields || [])]
+                                                newFields[index].type = e.target.value
+                                                setFormData({ ...formData, input_schema: { fields: newFields } })
+                                            }}
+                                            className="block w-1/2 rounded bg-black/20 border-white/10 text-white text-xs px-2 py-1"
+                                        >
+                                            <option value="text">Text</option>
+                                            <option value="number">Number</option>
+                                            <option value="email">Email</option>
+                                        </select>
+                                        <label className="flex items-center gap-2 text-xs text-gray-400">
+                                            <input
+                                                type="checkbox"
+                                                checked={field.required}
+                                                onChange={e => {
+                                                    const newFields = [...(formData.input_schema?.fields || [])]
+                                                    newFields[index].required = e.target.checked
+                                                    setFormData({ ...formData, input_schema: { fields: newFields } })
+                                                }}
+                                                className="rounded bg-white/10 border-white/20"
+                                            />
+                                            Required
+                                        </label>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const newFields = formData.input_schema?.fields?.filter((_: any, i: number) => i !== index)
+                                        setFormData({ ...formData, input_schema: { fields: newFields } })
+                                    }}
+                                    className="text-red-400 hover:text-red-300"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))}
+                        {(!formData.input_schema?.fields || formData.input_schema.fields.length === 0) && (
+                            <p className="text-sm text-gray-500 italic text-center py-2">No custom inputs defined.</p>
+                        )}
                     </div>
                 </div>
             </div>
