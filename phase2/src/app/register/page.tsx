@@ -14,6 +14,7 @@ export default function RegisterPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [fullName, setFullName] = useState('')
+    const [phone, setPhone] = useState('')
     const [username, setUsername] = useState('')
 
     const handleSignup = async (e: React.FormEvent) => {
@@ -30,6 +31,7 @@ export default function RegisterPage() {
             options: {
                 data: {
                     full_name: fullName,
+                    phone: phone,
                     username: username
                     // Note: Supabase trigger will handle plain 'users' table 
                     // IF we updated the trigger to pull metadata.
@@ -109,7 +111,25 @@ export default function RegisterPage() {
                             />
                         </div>
                     </div>
-                     */}
+                    {/* Mobile Number Field */}
+                    <div>
+                        <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-300">
+                            Mobile Number
+                        </label>
+                        <div className="mt-2">
+                            <input
+                                id="phone"
+                                name="phone"
+                                type="tel"
+                                autoComplete="tel"
+                                required
+                                value={phone}
+                                onChange={e => setPhone(e.target.value)}
+                                placeholder="+1234567890"
+                                className="block w-full rounded-md border-0 bg-white/5 py-2 px-3 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                            />
+                        </div>
+                    </div>
 
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-300">

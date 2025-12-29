@@ -5,6 +5,8 @@
 create table public.users (
   id uuid references auth.users not null primary key,
   email text,
+  phone text, -- Added phone number
+  full_name text, -- Added full name caching
   role text check (role in ('buyer', 'seller', 'admin')) default 'buyer',
   wallet_balance numeric default 0,
   kyc_status text default 'none',
@@ -20,11 +22,16 @@ create policy "Users can update their own profile" on public.users
   for update using (auth.uid() = id);
 
 -- Trigger to create public user on auth signup
-create function public.handle_new_user()
+create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.users (id, email)
-  values (new.id, new.email);
+  insert into public.users (id, email, phone, full_name)
+  values (
+    new.id, 
+    new.email,
+    new.raw_user_meta_data->>'phone',
+    new.raw_user_meta_data->>'full_name'
+  );
   return new;
 end;
 $$ language plpgsql security definer;
