@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { InventoryService } from '@/services/inventory.service'
+import { getSellerProductsAction, addInventoryItemAction } from './actions'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -19,13 +19,14 @@ export default function InventoryPage() {
 
     useEffect(() => {
         async function loadProducts() {
-            const supabase = createClient()
-            const { data: { user } } = await supabase.auth.getUser()
-            if (user) {
-                const data = await InventoryService.getSellerProducts(user.id)
+            try {
+                const data = await getSellerProductsAction()
                 setProducts(data || [])
+            } catch (error) {
+                console.error('Failed to load products', error)
+            } finally {
+                setLoading(false)
             }
-            setLoading(false)
         }
         loadProducts()
     }, [])
@@ -34,16 +35,9 @@ export default function InventoryPage() {
         e.preventDefault()
         setSubmitting(true)
         try {
-            const supabase = createClient()
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) throw new Error("No user")
-
             // For now, treating secretData as a single item. 
             // In a real bulk tool we'd split by newlines.
-            await InventoryService.addInventoryItem(user.id, {
-                productId: selectedProduct,
-                secretData: secretData
-            })
+            await addInventoryItemAction(selectedProduct, secretData)
 
             alert('Inventory added successfully!')
             setSecretData('')

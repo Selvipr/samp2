@@ -101,6 +101,14 @@ export default async function DashboardPage() {
                                         Seller Hub
                                     </Link>
                                 )}
+                                {profile?.role === 'admin' && (
+                                    <Link
+                                        href="/admin"
+                                        className="flex items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
+                                    >
+                                        Admin Panel
+                                    </Link>
+                                )}
                             </div>
 
                             <div className="mt-10">

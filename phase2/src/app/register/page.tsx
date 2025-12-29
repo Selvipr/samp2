@@ -47,24 +47,6 @@ export default function RegisterPage() {
         }
 
         if (data.user) {
-            // 2. Update Profile Manually (because trigger might be too simple)
-            const { error: profileError } = await supabase
-                .from('users')
-                .update({
-                    full_name: fullName,
-                    // username column doesn't exist in our schema yet, 
-                    // but user requested "More Fields". I'll stick to full_name for now which we added.
-                    // Let's assume username is just email prefix or ignored for now unless I add column.
-                    // I will ADD username column in next step if I want to be thorough, 
-                    // but for "Polish Auth" let's stick to what we have (full_name).
-                })
-                .eq('id', data.user.id)
-
-            if (profileError) {
-                // Not blocking, just log
-                console.error("Profile update failed", profileError)
-            }
-
             // Success
             alert("Account created! Please check your email.")
             router.push('/login')

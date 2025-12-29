@@ -5,8 +5,12 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { login } from './actions'
+import { useTransition } from 'react'
+
 export default function LoginPage() {
     const router = useRouter()
+    const [isPending, startTransition] = useTransition()
     const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -18,19 +22,18 @@ export default function LoginPage() {
         setLoading(true)
         setError('')
 
-        const supabase = createClient()
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        })
+        const formData = new FormData()
+        formData.append('email', email)
+        formData.append('password', password)
 
-        if (error) {
-            setError(error.message)
-            setLoading(false)
-        } else {
-            router.refresh()
-            router.push('/dashboard')
-        }
+        startTransition(async () => {
+            const result = await login(null, formData)
+            if (result?.error) {
+                setError(result.error)
+                setLoading(false)
+            }
+            // On success, the server action redirects, so we don't need to do anything here
+        })
     }
 
     const handleSocialLogin = async (provider: 'google' | 'github') => {

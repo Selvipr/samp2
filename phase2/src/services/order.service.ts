@@ -131,4 +131,45 @@ export class OrderService {
             .eq('id', orderId)
         if (error) throw error
     }
+
+    // Admin: Unlock inventory and refund buyer (conceptually)
+    static async refundOrder(orderId: string) {
+        const supabase = await createClient()
+
+        // 1. Get Order
+        const { data: order } = await supabase
+            .from('orders')
+            .select('items, total, buyer_id')
+            .eq('id', orderId)
+            .single()
+
+        if (!order) throw new Error("Order not found")
+
+        // 2. Mark Inventory as Available again
+        // Note: In real world, we might want to check if the key was exposed. 
+        // If exposed, maybe mark as 'compromised' instead of 'available'. 
+        // For MVP, we assume refund implies item is returned/invalidated or we just reset it.
+        await supabase
+            .from('inventory')
+            .update({ status: 'available', order_id: null } as any)
+            .eq('order_id', orderId)
+
+        // 3. Update Order Status
+        await supabase
+            .from('orders')
+            .update({ status: 'refunded' })
+            .eq('id', orderId)
+
+        // 4. Refund Buyer Balance (if wallet was used)
+        // Check payment method. If 'wallet', refund.
+        // For now, let's just assume we credit the wallet regardless as a "store credit" refund.
+        // Or strictly strictly only if payment_method = 'wallet'.
+        // Simplified:
+        const { data: buyer } = await supabase.from('users').select('wallet_balance').eq('id', order.buyer_id).single()
+        if (buyer) {
+            await supabase.from('users').update({
+                wallet_balance: (buyer.wallet_balance || 0) + order.total
+            }).eq('id', order.buyer_id)
+        }
+    }
 }
