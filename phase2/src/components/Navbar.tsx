@@ -10,9 +10,10 @@ import { useDictionary } from './LanguageProvider'
 interface NavbarProps {
     user: any | null
     lang: string
+    userRole?: 'buyer' | 'seller' | 'admin' | 'merchant' | null
 }
 
-export default function Navbar({ user, lang }: NavbarProps) {
+export default function Navbar({ user, lang, userRole }: NavbarProps) {
     const [isOpen, setIsOpen] = useState(false)
     const pathname = usePathname()
     const { common } = useDictionary()
@@ -20,7 +21,12 @@ export default function Navbar({ user, lang }: NavbarProps) {
     const navigation = [
         { name: common.home, href: `/${lang}` },
         { name: common.shop, href: `/${lang}/shop` },
-        ...(user ? [{ name: common.dashboard, href: `/${lang}/dashboard` }, { name: common.myOrders, href: `/${lang}/orders` }] : []),
+        ...(user ? [
+            { name: common.dashboard, href: `/${lang}/dashboard` },
+            { name: common.myOrders, href: `/${lang}/orders` },
+            ...(userRole === 'admin' ? [{ name: 'Admin Panel', href: `/${lang}/admin` }] : []),
+            ...((userRole === 'seller' || userRole === 'merchant' || userRole === 'admin') ? [{ name: 'Seller Dashboard', href: `/${lang}/seller` }] : [])
+        ] : []),
     ]
 
     return (

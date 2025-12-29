@@ -36,6 +36,19 @@ export default async function RootLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Fetch roles for Navbar RBAC
+  let userRole: 'buyer' | 'seller' | 'admin' | 'merchant' | null = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (profile) {
+      userRole = profile.role;
+    }
+  }
+
   // Await params to avoid Next.js warnings/errors in recent versions
   const { lang } = await params;
   const dictionary = await getDictionary(lang);
@@ -57,7 +70,7 @@ export default async function RootLayout({
         <LanguageProvider dictionary={dictionary}>
           <CurrencyProvider initialRate={initialRate}>
             <CartProvider>
-              <Navbar user={user} lang={lang} />
+              <Navbar user={user} lang={lang} userRole={userRole} />
               <ServiceWorkerRegister />
               <main className="pt-16">
                 {children}

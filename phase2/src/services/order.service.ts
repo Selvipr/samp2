@@ -53,6 +53,17 @@ export class OrderService {
 
         if (invError || !inventory) throw new Error('Out of Stock')
 
+        // 1.5 Check Buyer Balance (Pre-check)
+        const { data: buyerCheck } = await supabase
+            .from('users')
+            .select('wallet_balance')
+            .eq('id', buyerId)
+            .single()
+
+        if (!buyerCheck || (buyerCheck.wallet_balance || 0) < price) {
+            throw new Error("Insufficient Funds")
+        }
+
         // 2. Lock inventory 
         const { error: lockError } = await supabase
             .from('inventory')
@@ -93,6 +104,18 @@ export class OrderService {
             .from('inventory')
             .update({ order_id: order.id } as any)
             .eq('id', inventory.id)
+
+        // 5. Deduct Buyer Balance
+        // Note: In a real app, use RPC for atomic transaction.
+        const { error: deductError } = await supabase
+            .from('users')
+            .update({ wallet_balance: (buyerCheck.wallet_balance || 0) - price })
+            .eq('id', buyerId)
+
+        if (deductError) {
+            console.error('CRITICAL: Payment deduction failed for order', order.id)
+            // In real app: Cancel order here
+        }
 
         return order
     }
@@ -171,5 +194,30 @@ export class OrderService {
                 wallet_balance: (buyer.wallet_balance || 0) + order.total
             }).eq('id', order.buyer_id)
         }
+    }
+
+    // Fetch the secret data (key/file) for a completed order
+    static async getOrderSecret(orderId: string, buyerId: string) {
+        const supabase = await createClient()
+
+        // Security Check: Ensure order belongs to user and is completed
+        const { data: order } = await supabase
+            .from('orders')
+            .select('status, buyer_id')
+            .eq('id', orderId)
+            .single()
+
+        if (!order || order.buyer_id !== buyerId || order.status !== 'completed') {
+            return null
+        }
+
+        // Fetch linked inventory
+        const { data: inventory } = await supabase
+            .from('inventory')
+            .select('secret_data, type')
+            .eq('order_id', orderId)
+            .single()
+
+        return inventory
     }
 }

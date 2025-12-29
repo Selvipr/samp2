@@ -37,5 +37,28 @@
         "privacy": "Политика конфиденциальности",
         "terms": "Условия использования",
         "copyright": "© 2025 Shop2games Inc. Все права защищены."
+    },
+    "orders": {
+        "title": "Мои заказы",
+        "noOrders": "Нет заказов",
+        "noOrdersDesc": "Похоже, вы еще ничего не купили.",
+        "browseShop": "В магазин",
+        "orderNumber": "Заказ #",
+        "date": "Дата",
+        "viewDetails": "Подробнее",
+        "detailsTitle": "Детали заказа",
+        "status": "Статус",
+        "totalAmount": "Сумма",
+        "downloadInvoice": "Скачать инвойс",
+        "payment": "Оплата",
+        "email": "Email",
+        "deliveryNotes": "Заметки к доставке",
+        "items": "Товары",
+        "yourDigitalGoods": "Ваши товары",
+        "redeemImmediately": "Пожалуйста, активируйте немедленно.",
+        "safeDealEscrow": "Безопасная сделка",
+        "escrowDesc": "Средства заморожены. Подтвердите получение товара, чтобы раскрыть ключ и перевести средства продавцу.",
+        "confirmReceived": "Подтвердить получение",
+        "disputeTransaction": "Открыть спор"
     }
 }

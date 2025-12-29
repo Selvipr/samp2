@@ -37,5 +37,28 @@
         "privacy": "Privacy Policy",
         "terms": "Terms of Service",
         "copyright": "© 2025 Shop2games Inc. All rights reserved."
+    },
+    "orders": {
+        "title": "My Orders",
+        "noOrders": "No orders yet",
+        "noOrdersDesc": "Looks like you haven't purchased anything.",
+        "browseShop": "Browse Shop",
+        "orderNumber": "Order #",
+        "date": "Date",
+        "viewDetails": "View Details",
+        "detailsTitle": "Order Details",
+        "status": "Status",
+        "totalAmount": "Total Amount",
+        "downloadInvoice": "Download Invoice",
+        "payment": "Payment",
+        "email": "Email",
+        "deliveryNotes": "Delivery Notes",
+        "items": "Items",
+        "yourDigitalGoods": "Your Digital Goods",
+        "redeemImmediately": "Please redeem immediately.",
+        "safeDealEscrow": "Safe Deal Escrow",
+        "escrowDesc": "Your funds are held safely. Please verify the seller has delivered the item or wait for the key to be revealed upon confirmation.",
+        "confirmReceived": "Confirm Received & Release Funds",
+        "disputeTransaction": "Dispute Transaction"
     }
 }
