@@ -18,6 +18,7 @@ export interface Product {
     type: 'serial_key' | 'file' | 'direct_api'
     input_schema: InputSchema | null
     supplier_config: Record<string, any> | null
+    seller_id: string
     created_at: string
 }
 

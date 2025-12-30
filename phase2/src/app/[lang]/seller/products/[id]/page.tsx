@@ -7,12 +7,13 @@ import { notFound } from 'next/navigation'
 export default async function EditProductPage({
     params,
 }: {
-    params: { lang: string; id: string }
+    params: Promise<{ lang: string; id: string }>
 }) {
+    const { lang, id } = await params;
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    const productId = params.id
+    const productId = id
     const product = await SellerService.getProductById(productId)
 
     if (!product || product.seller_id !== user?.id) {
@@ -26,7 +27,7 @@ export default async function EditProductPage({
             <h1 className="text-3xl font-bold text-white mb-8">Edit Product</h1>
 
             <ProductForm
-                lang={params.lang}
+                lang={lang}
                 sellerId={user!.id}
                 initialData={product}
             />

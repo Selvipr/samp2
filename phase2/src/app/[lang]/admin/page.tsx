@@ -3,7 +3,7 @@ import { AdminService } from '@/services/admin.service'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AdminDashboard({ params }: { params: { lang: string } }) {
+export default async function AdminDashboard({ params }: { params: Promise<{ lang: string }> }) {
     const { lang } = await params;
     const supabase = await createClient()
 

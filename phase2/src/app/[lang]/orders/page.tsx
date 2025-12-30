@@ -8,7 +8,7 @@ import { getDictionary } from '@/lib/dictionary'
 export default async function OrdersPage({
     params,
 }: {
-    params: { lang: 'en' | 'ru' }
+    params: Promise<{ lang: 'en' | 'ru' }>
 }) {
     const { lang } = await params
     const dict = await getDictionary(lang)

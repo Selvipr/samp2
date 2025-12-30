@@ -7,7 +7,7 @@ export default async function AdminPanelLayout({
     params,
 }: {
     children: React.ReactNode
-    params: { lang: string }
+    params: Promise<{ lang: string }>
 }) {
     const { lang } = await params;
     const supabase = await createClient()

@@ -4,7 +4,7 @@ import { SellerService } from '@/services/seller.service'
 export default async function SellerDashboard({
     params,
 }: {
-    params: { lang: string }
+    params: Promise<{ lang: string }>
 }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

@@ -31,7 +31,7 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { lang: 'en' | 'ru' };
+  params: Promise<{ lang: string }>;
 }>) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -51,7 +51,7 @@ export default async function RootLayout({
 
   // Await params to avoid Next.js warnings/errors in recent versions
   const { lang } = await params;
-  const dictionary = await getDictionary(lang);
+  const dictionary = await getDictionary(lang as 'en' | 'ru');
 
   // Fetch initial exchange rate
   const { data: settings } = await supabase

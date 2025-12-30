@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { OrderService } from '@/services/order.service'
 
-export default async function DashboardPage({ params }: { params: { lang: string } }) {
+export default async function DashboardPage({ params }: { params: Promise<{ lang: string }> }) {
     const { lang } = await params;
     const supabase = await createClient()
 

@@ -7,15 +7,16 @@ export default async function SellerLayout({
     params,
 }: {
     children: React.ReactNode
-    params: { lang: string }
+    params: Promise<{ lang: string }>
 }) {
+    const { lang } = await params;
     const supabase = await createClient()
 
     // 1. Auth Check
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-        redirect(`/${params.lang}/login?next=/${params.lang}/seller`)
+        redirect(`/${lang}/login?next=/${lang}/seller`)
     }
 
     // 2. Role Check (RBAC)
@@ -28,12 +29,12 @@ export default async function SellerLayout({
     // Allow 'seller' (or 'merchant') AND 'admin' to access seller dashboard
     if (!profile || (profile.role !== 'seller' && profile.role !== 'merchant' && profile.role !== 'admin')) {
         // Redirect unauthorized users to home
-        redirect(`/${params.lang}`)
+        redirect(`/${lang}`)
     }
 
     return (
         <div className="min-h-screen bg-[#0a0a0c]">
-            <SellerSidebar lang={params.lang} />
+            <SellerSidebar lang={lang} />
             <main className="ml-64 pt-20 p-8">
                 {children}
             </main>

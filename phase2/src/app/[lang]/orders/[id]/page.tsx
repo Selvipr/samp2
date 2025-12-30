@@ -8,7 +8,7 @@ import OrderTracker from '@/components/OrderTracker'
 export default async function OrderDetailsPage({
     params,
 }: {
-    params: { id: string, lang: 'en' | 'ru' }
+    params: Promise<{ id: string, lang: 'en' | 'ru' }>
 }) {
     const { id, lang } = await params
     const dict = await getDictionary(lang)
